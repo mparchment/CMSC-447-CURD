@@ -1,7 +1,18 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
+from flask_cors import CORS
 import sqlite3
+import os
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder=os.path.abspath('frontend/build'))
+CORS(app)
+
+@app.route('/')
+def serve():
+    return send_from_directory(app.static_folder, 'index.html')
+
+@app.route('/<path:path>')
+def serve_static(path):
+    return send_from_directory(app.static_folder, path)
 
 @app.route('/users', methods=['POST'])
 def create_user():
@@ -47,7 +58,7 @@ def update_user(user_id):
 @app.route('/users/<int:user_id>', methods=['DELETE'])
 def delete_user(user_id):
     conn = sqlite3.connect('appdb.db')
-    conn.execute("DELETE FROM users WHERE id=?", (user_id,))
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM users WHERE id=?", (user_id,))
     conn.commit()
     return jsonify({'message': 'User deleted successfully'})
-
