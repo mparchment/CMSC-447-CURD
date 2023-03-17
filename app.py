@@ -1,8 +1,10 @@
 from flask import Flask, request, jsonify, send_from_directory
 import sqlite3 # Import SQLite3 to be used as the database.
 import os # Import os library to be able to deploy the frontend.
+from flask_cors import CORS
 
 app = Flask(__name__, static_folder=os.path.abspath('frontend/build'))
+CORS (app)
 
 # Home page of the CURD app -- uses the static frontend generated with npm build.
 @app.route('/')
@@ -17,7 +19,7 @@ def serve_static(path):
 def create_user():
     # Create route of app ...
     # First, connect to database:
-    database = sqlite3.databaseect('appdb.db')
+    database = sqlite3.connect('appdb.db')
     # Get JSON data from frontend:
     new_user = request.get_json()
     # Extract new user name from JSON:
@@ -37,7 +39,7 @@ def create_user():
 def get_users():
     # Read route of the app ...
     # Connect to the database:
-    database = sqlite3.databaseect('appdb.db')
+    database = sqlite3.connect('appdb.db')
     # Run SQLite3 command with execute() to read all users stored in the table,
     # Then call fetchall() to convert selected users into a list.
     users = database.execute("SELECT * FROM users").fetchall()
@@ -50,7 +52,7 @@ def get_users():
 def get_user(user_id):
     # Read route for a single user ...
     # Connect to the database:
-    database = sqlite3.databaseect('appdb.db')
+    database = sqlite3.connect('appdb.db')
     user = database.execute("SELECT * FROM users WHERE id=?", (user_id,)).fetchone()
     # Check if user does not exist in the database:
     if user is None:
@@ -64,7 +66,7 @@ def get_user(user_id):
 @app.route('/users/<int:user_id>', methods=['PUT'])
 def update_user(user_id):
     # Update route for a single user ...
-    database = sqlite3.databaseect('appdb.db')
+    database = sqlite3.connect('appdb.db')
     # Get JSON data from the frontend:
     updated_user = request.get_json()
     # Extract new name of user:
@@ -81,7 +83,7 @@ def update_user(user_id):
 @app.route('/users/<int:user_id>', methods=['DELETE'])
 def delete_user(user_id):
     # Delete route for a single user ...
-    database = sqlite3.databaseect('appdb.db')
+    database = sqlite3.connect('appdb.db')
     # Create cursor for the database to execute command:
     database_cmd = database.cursor()
     # Run SQLite3 command on the database to delete user with matching ID:
