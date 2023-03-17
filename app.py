@@ -40,11 +40,17 @@ def get_users():
     # Read route of the app ...
     # Connect to the database:
     database = sqlite3.connect('appdb.db')
+    
     # Run SQLite3 command with execute() to read all users stored in the table,
-    # Then call fetchall() to convert selected users into a list.
-    users = database.execute("SELECT * FROM users").fetchall()
+    cursor = database.execute("SELECT * FROM users")
+    
+    users = []
+    for row in cursor:
+        user = {'id': row[0], 'name': row[1], 'points': row[2]}
+        users.append(user)
+        
     # Close database connection for security:
-    database.close()
+    ## database.close()
     # Return all users currently stored in the database as JSON to the frontend:
     return jsonify(users)
 
